@@ -1,15 +1,26 @@
 package com.hw1.car;
 
 abstract class Car {
-    public Engine engine;
-    private String color;
-    private String name;
+    Engine engine;
+
+    public String color;
+    public String name;
 
     protected void start() {
         System.out.println("Car starting");
     }
 
-    abstract void open();
+    public void open(){
+        System.out.println("Car is open");
+    }
+
+    public void move(){
+        System.out.println("Car is moving");
+    }
+
+    public void stop(){
+        System.out.println("Car is stop");
+    }
 
     public Engine getEngine() {
         return engine;
