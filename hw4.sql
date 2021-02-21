@@ -1,0 +1,53 @@
+USE master
+GO
+DROP DATABASE Cinema
+GO
+CREATE DATABASE Cinema
+GO
+USE Cinema
+GO
+CREATE TABLE Film
+(
+Id INT PRIMARY KEY IDENTITY(1,1),
+[Name] VARCHAR(100)  NOT NULL,
+Duration TIME  NOT NULL,
+Price FLOAT  NOT NULL
+)
+CREATE TABLE Hall
+(
+Id INT PRIMARY KEY IDENTITY(1,1),
+[Name] VARCHAR(100) NOT NULL,
+)
+CREATE TABLE Schedule
+(
+Id INT PRIMARY KEY IDENTITY(1,1),
+HallId INT FOREIGN KEY REFERENCES Hall(Id) NOT NULL,
+FilmId INT FOREIGN KEY REFERENCES Film(Id)  NOT NULL,
+TIME datetime NOT NULL
+)
+ 
+INSERT INTO Film VALUES ('Film1, 13-е','1:00',100),('Film2','3:00',200),('Film3','2:00',300),('Film4','1:00',400),('Film5','1:30',500)
+INSERT INTO Hall VALUES ('Hall1'),('Hall2'),('Hall3')
+INSERT INTO Schedule VALUES (1,1,'2021-01-01 3:00'),(2,2,'2021-01-01 4:30'),(3,3,'2020-01-01 7:30'),(1,4,'2020-01-01 10:30'),(2,5,'2020-01-01 14:00')
+ 
+SELECT * FROM Schedule JOIN Film
+ON FilmId = Film.Id
+ 
+SELECT ms.Id, ms.HallId,ms.FilmId,ms.Time,Film.Id,Film.Name,Film.Duration,Film.Price FROM Schedule AS ms JOIN Film 
+                        ON FilmId = Film.Id
+WHERE DATEADD(MINUTE,DATEPART(MINUTE,Duration),DATEADD(HOUR,DATEPART(HOUR,Duration),[TIME])) > SOME 
+(
+SELECT [TIME] FROM Schedule
+WHERE TIME >= ms.Time
+AND
+TIME < DATEADD(MINUTE,DATEPART(MINUTE,Duration),DATEADD(HOUR,DATEPART(HOUR,Duration),ms.[TIME])) AND HallId = ms.HallId
+)
+AND
+[TIME] < SOME
+(
+SELECT [TIME] FROM Schedule 
+WHERE TIME >= ms.Time
+AND
+TIME < DATEADD(MINUTE,DATEPART(MINUTE,Duration),DATEADD(HOUR,DATEPART(HOUR,Duration),ms.[TIME])) AND HallId = ms.HallId
+)
+ORDER BY TIME
